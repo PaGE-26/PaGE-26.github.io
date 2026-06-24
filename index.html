@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PaGE: Towards Practical Human-Level Gaze Target Estimation — ICLR 2026">
+  <title>PaGE — Practical Human-Level Gaze Target Estimation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge">ICLR 2026</span>
+    <h1>PaGE: Towards Practical Human-Level<br>Gaze Target Estimation</h1>
+    <p class="subtitle">Practical Gaze Estimator with human-level accuracy and deployable student models</p>
+
+    <p class="authors">
+      <span class="author">Zhoutong Ye<sup>1,*</sup></span>,
+      <span class="author">Chengwen Zhang<sup>1,*</sup></span>,
+      <span class="author">Jiaqi Liu<sup>1</sup></span>,
+      <span class="author">Xiangwu Li<sup>2</sup></span>,
+      <span class="author">Xutong Wang<sup>1</sup></span>,
+      <span class="author">Yu Mei<sup>1</sup></span>,
+      <span class="author">Zhaibin Cui<sup>1</sup></span>,
+      <span class="author">Mingze Sun<sup>1</sup></span>,
+      <span class="author">Qingyang Wan<sup>1</sup></span>,
+      <span class="author">Chang Liu<sup>1</sup></span>,
+      <span class="author corresponding">Chun Yu<sup>1</sup></span>,
+      <span class="author">Yuanchun Shi<sup>1</sup></span>
+    </p>
+    <p class="affiliations">
+      <sup>1</sup>Tsinghua University &nbsp;&nbsp;
+      <sup>2</sup>Jinan University &nbsp;&nbsp;
+      <sup>*</sup>Equal contribution &nbsp;&nbsp;
+      <sup>†</sup>Corresponding author
+    </p>
+
+    <div class="links">
+      <a class="btn btn-primary" href="https://github.com/OctopusWen/gazelle_plus" target="_blank" rel="noopener">Code &amp; Models</a>
+      <a class="btn btn-secondary" href="#bibtex">BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section id="abstract">
+    <h2>Abstract</h2>
+    <p class="abstract">
+      Gaze target estimation, the task of predicting where a person is looking in a scene,
+      is crucial to understanding human attention and intent. It is a challenging task that
+      combines high-level understanding of global scene semantics and precise spatial reasoning
+      using human appearance (e.g. pose, eye orientation). As a result, human-level performance
+      remains elusive for existing models, limiting their practical application. To this end,
+      we propose <strong>PaGE</strong> (Practical Gaze Estimator), a gaze estimation model that
+      explicitly models the complex interaction between scene and head features. Using a PaGE model
+      with a large ViT-H+ backbone as the teacher, we further distill student models with lighter
+      backbones on a much larger and more diverse unlabeled dataset. The architectural improvements
+      and novel training recipe allow PaGE to achieve state-of-the-art performance on several gaze
+      estimation tasks, <strong>outperforming humans in 7 out of 9 metrics</strong> while reducing
+      the human–AI gap by at least 60% in the remaining 2. The distilled student models retain most
+      of the teacher's performance while being lightweight enough for practical deployment on
+      robots and consumer devices.
+    </p>
+
+    <div class="highlights">
+      <div class="highlight-card">
+        <div class="metric">7 / 9</div>
+        <div class="label">metrics surpass human performance on GazeFollow, VAT &amp; ChildPlay</div>
+      </div>
+      <div class="highlight-card">
+        <div class="metric">≥60%</div>
+        <div class="label">reduction in human–AI gap on the remaining metrics</div>
+      </div>
+      <div class="highlight-card">
+        <div class="metric">~10%</div>
+        <div class="label">of teacher FLOPs for distilled student models with near-SotA accuracy</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>Method</h2>
+    <p>
+      PaGE builds upon DINOv3 with a <strong>Scene-head Interaction Module (SIM)</strong> that uses
+      cross-attention between scene and head branches to model inter-branch feature interaction in a
+      ViT-native manner. Training follows a two-stage recipe: decoder-only training with a frozen
+      backbone, followed by supervised finetuning (SFT) of the full model. Lightweight student models
+      are trained via <strong>token-level feature distillation</strong> from a PaGE ViT-H+ teacher on
+      1.17M unlabeled head crops from MPII and OpenImages V7.
+    </p>
+
+    <figure class="figure">
+      <img src="static/figures/architecture.png" alt="PaGE architecture diagram">
+      <figcaption>
+        <strong>Figure 1.</strong> Architecture of PaGE. Bottom left: our SIM layer. Bottom right:
+        the token-concat head branch. <em>L</em><sub>distill</sub> marks where token-level feature
+        distillation is applied during student training.
+      </figcaption>
+    </figure>
+  </section>
+
+</main>
+
+<section id="results" class="container-wide">
+  <div class="container" style="max-width: var(--max-width-wide); padding: 48px 24px 0;">
+    <h2>Results</h2>
+    <p>
+      PaGE ViT-H+ achieves human-level performance on GazeFollow, VideoAttentionTarget (VAT), and
+      ChildPlay. Distilled variants (ViT-S, ViT-S+, ViT-B) retain most of the teacher's capability
+      at 5–10% of its compute cost.
+    </p>
+  </div>
+
+  <h3 style="padding: 0 24px; margin-top: 0;">Table 3. Comparison with Prior Art</h3>
+  <div class="table-wrap">
+    <table class="table-compact">
+      <thead>
+        <tr>
+          <th rowspan="2">Model</th>
+          <th colspan="3">GazeFollow</th>
+          <th colspan="3">VideoAttentionTarget</th>
+          <th colspan="3">ChildPlay</th>
+        </tr>
+        <tr>
+          <th>AUC↑</th><th>Avg L2↓</th><th>Min L2↓</th>
+          <th>AUC↑</th><th>L2↓</th><th>AP<sub>in/out</sub>↑</th>
+          <th>AUC↑</th><th>L2↓</th><th>AP<sub>in/out</sub>↑</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Recasens et al. (2015)</td><td>0.878</td><td>0.190</td><td>0.113</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Chong et al. (2018)</td><td>0.896</td><td>0.187</td><td>0.112</td><td>0.833</td><td>0.171</td><td>0.712</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Lian et al. (2019)</td><td>0.906</td><td>0.145</td><td>0.081</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Chong et al. (2020)</td><td>0.921</td><td>0.137</td><td>0.077</td><td>0.860</td><td>0.134</td><td>0.853</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Fang et al. (2021)</td><td>0.922</td><td>0.124</td><td>0.067</td><td>0.905</td><td>0.108</td><td>0.896</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Bao et al. (2022)</td><td>0.928</td><td>0.122</td><td class="na">—</td><td>0.885</td><td>0.120</td><td>0.869</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Jin et al. (2022)</td><td>0.920</td><td>0.118</td><td>0.063</td><td>0.900</td><td>0.104</td><td>0.895</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Gupta et al. (2022)</td><td>0.943</td><td>0.114</td><td>0.056</td><td>0.914</td><td>0.110</td><td>0.879</td><td>0.919</td><td>0.113</td><td>0.983</td></tr>
+        <tr><td>Miao et al. (2023)</td><td>0.934</td><td>0.123</td><td>0.065</td><td>0.917</td><td>0.109</td><td>0.908</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Tafasca et al. (2023)</td><td>0.939</td><td>0.122</td><td>0.062</td><td>0.914</td><td>0.109</td><td>0.834</td><td>0.935</td><td>0.107</td><td>0.986</td></tr>
+        <tr><td>Tafasca et al. (2024)</td><td>0.944</td><td>0.113</td><td>0.057</td><td class="na">—</td><td>0.107</td><td>0.891</td><td class="na">—</td><td>0.106</td><td>0.990</td></tr>
+        <tr><td>Song et al. (2024)</td><td>0.949</td><td>0.105</td><td>0.047</td><td>0.938</td><td>0.102</td><td>0.905</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+        <tr><td>Gaze-LLE ViT-L<sup>*</sup></td><td>0.958</td><td>0.099</td><td>0.041</td><td>0.937</td><td>0.103</td><td>0.903</td><td>0.951</td><td>0.101</td><td>0.994</td></tr>
+        <tr class="sep"><td>Gemini 3.5 Flash</td><td class="na">—</td><td>0.128</td><td>0.067</td><td class="na">—</td><td>0.138</td><td class="na">—</td><td class="na">—</td><td>0.111</td><td class="na">—</td></tr>
+        <tr class="sep ours"><td>PaGE ViT-S Distill</td><td>0.964</td><td>0.086</td><td>0.033</td><td>0.964</td><td>0.074</td><td>0.937</td><td>0.970</td><td>0.075</td><td>0.997</td></tr>
+        <tr class="ours"><td>PaGE ViT-S+ Distill</td><td>0.965</td><td>0.086</td><td>0.033</td><td>0.965</td><td>0.074</td><td>0.939</td><td>0.970</td><td>0.075</td><td class="best">0.997</td></tr>
+        <tr class="ours"><td>PaGE ViT-B Distill</td><td class="best">0.966</td><td class="second">0.081</td><td class="second">0.029</td><td class="second">0.969</td><td class="second">0.068</td><td class="second">0.945</td><td class="second">0.973</td><td class="second">0.070</td><td class="second">0.997</td></tr>
+        <tr class="ours"><td>PaGE ViT-H+</td><td class="second">0.966</td><td class="best">0.080</td><td class="best">0.029</td><td class="best">0.972</td><td class="best">0.064</td><td class="best">0.951</td><td class="best">0.975</td><td class="best">0.069</td><td>0.995</td></tr>
+        <tr class="sep human"><td>Human</td><td>0.924</td><td>0.096</td><td>0.040</td><td>0.921</td><td>0.051</td><td>0.925</td><td>0.911</td><td>0.048</td><td>0.993</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="table-caption">
+    Comparison between prior art, the PaGE family, and humans. All four PaGE models far outperform
+    the previous SotA, with PaGE ViT-H+ and PaGE ViT-B Distill achieving human-level performance.
+    <sup>*</sup>Gaze-LLE ViT-L, results reported in the original paper.
+  </p>
+
+  <div class="container" style="max-width: var(--max-width-wide); padding-bottom: 48px; border-top: 1px solid var(--border); margin-top: 32px; padding-top: 32px;">
+    <figure class="figure">
+      <img src="static/figures/results.png" alt="Qualitative results on benchmark datasets">
+      <figcaption>
+        <strong>Figure 2.</strong> Qualitative results of PaGE ViT-H+ on GazeFollow, VideoAttentionTarget,
+        ChildPlay, GOO-Real, and Zhang et al. Green boxes mark the target head; gaze lines and heatmaps
+        show model predictions.
+      </figcaption>
+    </figure>
+
+    <figure class="figure">
+      <img src="static/figures/results_others.png" alt="Out-of-distribution qualitative results">
+      <figcaption>
+        <strong>Figure 3.</strong> Out-of-distribution qualitative results. PaGE generalizes beyond
+        human gaze in realistic images to animals, cameras, and animation.
+      </figcaption>
+    </figure>
+
+    <figure class="figure">
+      <img src="static/figures/results_on_screen.png" alt="Screen gaze estimation results">
+      <figcaption>
+        <strong>Figure 4.</strong> Fine-grained screen gaze estimation. Training with screen data
+        during SFT substantially improves gaze localization on monitors.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<main class="container">
+
+  <section id="models">
+    <h2>Model Zoo</h2>
+    <p>
+      We release pretrained checkpoints for the PaGE family. The ViT-H+ teacher is finetuned end-to-end;
+      student models are distilled from the teacher and finetuned on the labeled training set.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Backbone</th>
+            <th>GFLOPs</th>
+            <th>Checkpoint</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="ours">
+            <td>PaGE ViT-H+</td>
+            <td>DINOv3 ViT-H+</td>
+            <td>2373.6</td>
+            <td><code>vithplus_ft.pt</code></td>
+          </tr>
+          <tr class="ours">
+            <td>PaGE ViT-B Distill</td>
+            <td>DINOv3 ViT-B</td>
+            <td>283.1</td>
+            <td><code>vitb_distill.pt</code></td>
+          </tr>
+          <tr class="ours">
+            <td>PaGE ViT-B Distill (Screen)</td>
+            <td>DINOv3 ViT-B</td>
+            <td>283.1</td>
+            <td><code>vitb_distill_screen.pt</code></td>
+          </tr>
+          <tr class="ours">
+            <td>PaGE ViT-S+ Distill</td>
+            <td>DINOv3 ViT-S+</td>
+            <td>115.2</td>
+            <td><code>vitsplus_distill.pt</code></td>
+          </tr>
+          <tr class="ours">
+            <td>PaGE ViT-S Distill</td>
+            <td>DINOv3 ViT-S</td>
+            <td>96.9</td>
+            <td><code>vits_distill.pt</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      See the <a href="https://github.com/OctopusWen/gazelle_plus" target="_blank" rel="noopener">code repository</a>
+      for installation instructions and usage examples.
+    </p>
+  </section>
+
+  <section id="bibtex">
+    <h2>BibTeX</h2>
+    <pre class="bibtex">@inproceedings{ye2026page,
+  title     = {{PaGE}: Towards Practical Human-Level Gaze Target Estimation},
+  author    = {Ye, Zhoutong and Zhang, Chengwen and Liu, Jiaqi and Li, Xiangwu and
+               Wang, Xutong and Mei, Yu and Cui, Zhaibin and Sun, Mingze and
+               Wan, Qingyang and Liu, Chang and Yu, Chun and Shi, Yuanchun},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2026}
+}</pre>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 PaGE Authors</p>
+</footer>
+
+</body>
+</html>
