@@ -290,7 +290,6 @@ td.na {
 
 tr.ours td {
   background: #f0f7fb;
-  font-weight: 600;
 }
 
 tr.human td {
@@ -298,12 +297,11 @@ tr.human td {
   font-style: italic;
 }
 
-.best {
+tr td.best {
   font-weight: 700;
-  color: var(--accent);
 }
 
-.second {
+tr td.second {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
